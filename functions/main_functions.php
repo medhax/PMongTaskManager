@@ -1,0 +1,3 @@
+<?php
+$appName = 'Prova';
+?>
