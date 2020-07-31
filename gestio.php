@@ -1,19 +1,28 @@
 <?php
-//Made by Carles Brunet
 
+//Made by Carles Brunet
 include_once('./functions/main_functions.php');
-include('./functions/vCards.php');
-$vCard = new vCard('./vCard.vcf');
+
+if ( !isset($_GET["page"]) ){
+
+    die();
+    
+    }
+
 session_start();
 
-if (!empty($_SESSION['loggedin'])) {
+
+if (empty($_SESSION['loggedin'])) {
    
 
 
-} else{
+
     header("Location: login.php"); //If user isn't logged in then redirect him to login page
     die();
 }
+
+    
+
 
 if( isset($_GET['submit']) )
 {
@@ -26,6 +35,19 @@ if( isset($_GET['submit']) )
 
     //then you can use them in a PHP function. 
     $result = createTask($newTaskTitle, $newTaskDescription, $newTaskUserAssigned, $newTaskEndDate, $newTaskStartDate);
+}
+if( isset($_GET['submit2']) )
+{
+    //be sure to validate and clean your variables
+    $newTaskId = htmlentities($_GET['id']);
+    $newTaskTitle = htmlentities($_GET['title']);
+    $newTaskDescription = htmlentities($_GET['description']);
+    $newTaskUserAssigned = htmlentities($_GET['user_assigned']);
+    $newTaskEndDate = htmlentities($_GET['end_date']);
+    $newTaskStartDate = date('Y-m-d');
+
+    //then you can use them in a PHP function. 
+    $result = saveEditedTask($newTaskId,$newTaskTitle, $newTaskDescription, $newTaskUserAssigned, $newTaskEndDate, $newTaskStartDate);
 }
 
 ?>
@@ -53,7 +75,7 @@ if( isset($_GET['submit']) )
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <a class="navbar-brand" href="index.html"><?php echo($appName) ?> - <?php echo count($vCard)?></a>
+        <a class="navbar-brand" href="index.html"><?php echo($appName) ?></a>
         <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i
                 class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
@@ -89,7 +111,7 @@ if( isset($_GET['submit']) )
 
 
                         <div class="sb-sidenav-menu-heading">Gestió de tasques</div>
-                        <a class="nav-link" href="tables.html">
+                        <a class="nav-link" href="gestio.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-list-ol	"></i></div>
                             Tasques
                         </a>
@@ -156,52 +178,13 @@ if( isset($_GET['submit']) )
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    <div class="modal-body">
+                                    <div class="modal-body editModalBody">
+                            
 
+                                        
 
-                                        <form>
-                                            <div class="form-group">
-                                                <label for="taskTitleInput">Títol de la tasca</label>
-                                                <input type="text" class="form-control" id="taskTitleInput"
-                                                    placeholder="Títol" name="title">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="exampleFormControlSelect1">Usuari assignat</label>
-                                                <select class="form-control" id="exampleFormControlSelect1"
-                                                    name="user_assigned">
-                                                    <option value="carlesbrunet">Carles Brunet</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="exampleFormControlTextarea1">Descripció</label>
-                                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
-                                                    name="description"></textarea>
-                                            </div>
-                                            <input type="date" class="form-control" id="taskTitleInput"
-                                                placeholder="Data de finalització" name="end_date">
-
-                                            <?php
-$keys = array('page');
-foreach($keys as $name) {
-  if(!isset($_GET[$name])) {
-    continue;
-  }
-  $value = htmlspecialchars($_GET[$name]);
-  $name = htmlspecialchars($name);
-  echo '<input type="hidden" name="'. $name .'" value="'. $value .'">';
-}
-?>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-dismiss="modal">Descartar</button>
-                                        <button type="submit" name="submit2" class="btn btn-primary">Desar</button>
-                                        </form>
+                                  
+                                   
                                     </div>
                                 </div>
                             </div>
@@ -224,14 +207,14 @@ foreach($keys as $name) {
 
                                         <form>
                                             <div class="form-group">
-                                                <label for="taskTitleInput">Títol de la tasca</label>
-                                                <input type="text" class="form-control" id="taskTitleInput"
-                                                    placeholder="Títol" name="title">
+                                                <label for="newTaskTitleInput">Títol de la tasca</label>
+                                                <input type="text" class="form-control" id="newTaskTitleInput"
+                                                    placeholder="Títol" name="title" required>
                                             </div>
                                             <div class="form-group">
-                                                <label for="exampleFormControlSelect1">Usuari assignat</label>
-                                                <select class="form-control" id="exampleFormControlSelect1"
-                                                    name="user_assigned">
+                                                <label for="newTaskUserAssignedInput">Usuari assignat</label>
+                                                <select class="form-control" id="newTaskUserAssignedInput"
+                                                    name="user_assigned" required>
                                                     <option value="carlesbrunet">Carles Brunet</option>
                                                     <option>2</option>
                                                     <option>3</option>
@@ -241,24 +224,15 @@ foreach($keys as $name) {
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="exampleFormControlTextarea1">Descripció</label>
-                                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
-                                                    name="description"></textarea>
+                                                <label for="newTaskDescriptionInput">Descripció</label>
+                                                <textarea class="form-control" id="newTaskDescriptionInput" rows="3"
+                                                    name="description" required></textarea>
                                             </div>
-                                            <input type="date" class="form-control" id="taskTitleInput"
-                                                placeholder="Data de finalització" name="end_date">
+                                            <input type="date" class="form-control" id="newEndTaskInput"
+                                                placeholder="Data de finalització" name="end_date"required>
 
-                                            <?php
-$keys = array('page');
-foreach($keys as $name) {
-  if(!isset($_GET[$name])) {
-    continue;
-  }
-  $value = htmlspecialchars($_GET[$name]);
-  $name = htmlspecialchars($name);
-  echo '<input type="hidden" name="'. $name .'" value="'. $value .'">';
-}
-?>
+                                        
+
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
@@ -277,40 +251,18 @@ foreach($keys as $name) {
                             <i class="fas fa-table mr-1"></i>
                             Tasques pendents
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Títol de la tasca</th>
-                                            <th>Descripció</th>
-                                            <th>Usuari assignat</th>
-                                            <th>Data de finalització</th>
-                                            <th>Accions</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Títol de la tasca</th>
-                                            <th>Descripció</th>
-                                            <th>Usuari assignat</th>
-                                            <th>Data de finalització</th>
-                                            <th>Accions</th>
-
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-                                        <?php
+                        <div    class="card-body">
+                           
+                            
+                                    <?php
 
 listTasques();
 
 ?>
 
 
-                                    </tbody>
-                                </table>
-                            </div>
+
+                      
                         </div>
                     </div>
                 </div>
@@ -340,18 +292,28 @@ listTasques();
     <script src="dist/assets/demo/datatables-demo.js"></script>
      <script type="text/javascript">
         $('.editTask').on('click', function () {
-            var $item = $(this).closest("tr")   // Finds the closest row <tr> 
-                       .find(".nr")     // Gets a descendent with class="nr"
-                       .text();    
-            $('.modal-body').load('gestio.php?editId=', function () {
-                    // Retrieves the text within <td>
+            var bid = this.id; // button ID 
+    var trid = $(this).closest('div').attr('id'); 
 
-    $("#editModal").append($item); 
+    $.ajax({
+      type:'post',
+      url:'./functions/main_functions.php',
+      data: {idEditTask: trid},
+      success:function(msgsub) {
+       $('.editModalBody').html(msgsub);
+         
+         
+    
+      }
+    });
+            
+    
                 $('#editModal').modal({
                     show: true
                 });
-            });
+            
         });
+       
     </script>
 </body>
 

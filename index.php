@@ -3,6 +3,8 @@
 
 include_once('./functions/main_functions.php');
 
+include('./functions/vCards.php');
+$vCard = new vCard('./vCard.vcf');
 session_start();
 
 if (empty($_SESSION['loggedin'])) {
@@ -144,42 +146,13 @@ if (empty($_SESSION['loggedin'])) {
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table mr-1"></i>
-                            Tasques pendents
+                            Dades vàries
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Títol de la tasca</th>
-                                            <th>Descripció</th>
-                                            <th>Usuari assignat</th>
-                                            <th>Data de finalització</th>
-                                            <th>Accions</th>
-
-
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Títol de la tasca</th>
-                                            <th>Descripció</th>
-                                            <th>Usuari assignat</th>
-                                            <th>Data de finalització</th>
-                                            <th>Accions</th>
-                                        </tr>
-                                    </tfoot>
-                                    <tbody>
-                                        <?php
-
-listTasques();
-
-?>
-
-
-                                    </tbody>
-                                </table>
-                            </div>
+                            
+                            <p>Número de correos cargados en la vCard -> <?php echo count($vCard) ?></p>
+                           <?php 
+                           listMails() ?>
                         </div>
                     </div>
                 </div>
